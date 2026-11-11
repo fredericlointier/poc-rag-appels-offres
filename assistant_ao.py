@@ -9,7 +9,7 @@
 #
 # INSTALLATION (une seule fois) :
 #   pip3 install mistralai
-#   + upgrade 26.3 : "pip3 install --upgrade pi"
+#   + upgrade 26.3 : "pip3 install --upgrade pip"
 #
 # CLE API : dans une variable d'environnement.
 #   Terminal en 2 prompts :
@@ -39,19 +39,7 @@ PROMPT_SYSTEME = (
     "sans rien inventer ni compléter de mémoire."
 )
 
-# --- 3. La boucle de dialogue ---------------------------------
-def poser_question(question: str) -> str:
-    """Envoie la question au modèle et renvoie sa réponse."""
-    reponse = client.chat.complete(
-        model="mistral-medium-latest",
-        messages=[
-            {"role": "system", "content": PROMPT_SYSTEME},
-            {"role": "user", "content": question},
-        ],
-    )
-    return reponse.choices[0].message.content
-
-# --- 4. Chargement des documents et chunking ------------------
+# --- 3. Chargement des documents et chunking ------------------
 DOSSIER_DOCS = "docs_ao"   # dossier à côté du script
 
 def charger_documents(dossier: str) -> list[dict]:
@@ -72,7 +60,7 @@ def charger_documents(dossier: str) -> list[dict]:
                 })
     return chunks
 
-# --- 5. Recherche par embeddings ---------------------------------
+# --- 4. Recherche par embeddings ---------------------------------
 MODELE_EMBEDDING = "mistral-embed"
 
 def calculer_embeddings(textes: list[str]) -> list[list[float]]:
@@ -93,14 +81,14 @@ def similarite(a: list[float], b: list[float]) -> float:
     return num / (norme_a * norme_b)
 
 
-def rechercher(question: str, chunks: list[dict], index: list[list[float]], k: int = 2):
+def rechercher(question: str, chunks: list[dict], index: list[list[float]], k: int = 3):
     """Renvoie les k chunks les plus proches du sens de la question."""
     vecteur_question = calculer_embeddings([question])[0]
     scores = [similarite(vecteur_question, v) for v in index]
     classement = sorted(range(len(chunks)), key=lambda i: scores[i], reverse=True)
     return [(chunks[i], scores[i]) for i in classement[:k]]
 
-# --- 6. La réponse agrégeant toutes les étapes précédentes -------
+# --- 5. La réponse agrégeant toutes les étapes précédentes -------
 def repondre(question: str, chunks: list[dict], index: list[list[float]], k: int = 3):
     """RAG complet : recherche les passages pertinents, les injecte
     dans la question, et fait rédiger la réponse sourcée par le modèle."""
@@ -118,7 +106,7 @@ def repondre(question: str, chunks: list[dict], index: list[list[float]], k: int
     return reponse.choices[0].message.content, resultats
 
 
-# --- 7. Le main agrégeant toutes les étapes précédentes -------
+# --- 6. Le main agrégeant toutes les étapes précédentes -------
 def main() -> None:
     chunks = charger_documents(DOSSIER_DOCS)
     print(f"{len(chunks)} chunks chargés, calcul des embeddings...")
