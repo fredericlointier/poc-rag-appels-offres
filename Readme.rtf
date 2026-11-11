@@ -1,0 +1,130 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid1\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa321\partightenfactor0
+
+\f0\b\fs48 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Assistant de r\'e9ponse aux appels d'offres (POC RAG)\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 Assistant en ligne de commande qui r\'e9pond aux questions des r\'e9dacteurs de r\'e9ponses \'e0 appels d'offres 
+\f0\b en s'appuyant uniquement sur les documents de r\'e9f\'e9rence
+\f1\b0 , en citant syst\'e9matiquement ses sources, et en refusant de r\'e9pondre lorsque l'information est absente.\
+POC r\'e9alis\'e9 avec l'API Mistral (mod\'e8les 
+\f2\fs26 mistral-medium-latest
+\f1\fs24  et 
+\f2\fs26 mistral-embed
+\f1\fs24 ), \'e0 vis\'e9e d'apprentissage et de d\'e9monstration.\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 Le probl\'e8me r\'e9solu\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 Un LLM seul, interrog\'e9 sur un m\'e9tier, produit une r\'e9ponse plausible... mais invent\'e9e. Exemple r\'e9el, avant RAG, \'e0 la question \'ab Quelle garantie par le candidat ? \'bb :\
+\pard\pardeftab720\sa240\partightenfactor0
+\cf0 - Garantie de soumission, garantie de bonne fin, garantie de performance, garantie financi\'e8re, garantie l\'e9gale de conformit\'e9...\
+-> R\'e9ponse de manuel, hors sujet. \
+Apr\'e8s RAG, avec les m\'eames documents :\
+\pard\pardeftab720\sa240\partightenfactor0
+\cf0 - Le titulaire du march\'e9 garantit ses livraisons pendant 12 mois \'e0 compter de la fin de la recette, au prononc\'e9 de la VSR [conditions_administratives.txt].\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 Architecture en 4 briques\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls1\ilvl0
+\fs24 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Chunking
+\f1\b0  : les documents de r\'e9f\'e9rence (
+\f2\fs26 docs_ao/*.txt
+\f1\fs24 ) sont d\'e9coup\'e9s paragraphe par paragraphe, chaque chunk conservant son fichier source.\
+\ls1\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Embeddings
+\f1\b0  : chaque chunk est vectoris\'e9 avec 
+\f2\fs26 mistral-embed
+\f1\fs24  (l'index est calcul\'e9 une fois au d\'e9marrage).\
+\ls1\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Recherche s\'e9mantique
+\f1\b0  : la question est vectoris\'e9e \'e0 son tour ; les 3 chunks les plus proches du sens sont s\'e9lectionn\'e9s par similarit\'e9 cosinus \'97 m\'eame sans aucun mot en commun avec la question.\
+\ls1\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	4	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 RAG sourc\'e9
+\f1\b0  : les passages trouv\'e9s sont inject\'e9s dans le prompt, cadr\'e9 avec une consigne syst\'e8me stricte : \'ab\'a0r\'e9pondre uniquement \'e0 partir des extraits, citer la source, et r\'e9pondre \'ab Information absente des documents de r\'e9f\'e9rence \'bb si l'information ne s'y trouve pas\'a0\'bb.\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 Installation\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs26 \cf0 # 1. Cloner puis cr\'e9er un environnement virtuel\
+python3 -m venv venv\
+source venv/bin/activate\
+\
+# 2. Installer les d\'e9pendances\
+pip install mistralai\
+\
+# 3. D\'e9finir sa cl\'e9 API (console.mistral.ai) \'97 jamais dans le code\
+export MISTRAL_API_KEY="votre_cle"\
+\
+# 4. Lancer\
+python assistant_ao.py\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\fs24 \cf0 Compatible Python 3.10+. Tester avec le package 
+\f2\fs26 mistralai
+\f1\fs24  3.7 (la classe 
+\f2\fs26 Mistral
+\f1\fs24  y est import\'e9e depuis 
+\f2\fs26 mistralai.client
+\f1\fs24  ; avec les versions 1.x, l'import se fait directement depuis 
+\f2\fs26 mistralai
+\f1\fs24 ).\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 Utilisation\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 D\'e9poser ses documents de r\'e9f\'e9rence au format texte dans 
+\f2\fs26 docs_ao/
+\f1\fs24  (paragraphes s\'e9par\'e9s par des lignes vides), puis poser ses questions dans le terminal :\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 Question > quelle garantie par le candidat ?\
+Question > quel est le montant de la caution bancaire exig\'e9e ?\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\fs24 \cf0 R\'e9ponse attendue pour la seconde : \'ab Information absente des documents de r\'e9f\'e9rence \'bb \'97 c'est un crit\'e8re d'acceptation du POC, pas un d\'e9faut.\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 Enseignements du d\'e9veloppement\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls2\ilvl0
+\f1\b0\fs24 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 La qualit\'e9 du RAG tient au duo recherche + r\'e9daction : le classement des chunks peut \'eatre serr\'e9 (scores proches sur un corpus court) ; injecter les 3 meilleurs candidats et laisser le mod\'e8le choisir dans les extraits est plus robuste que de n'injecter que le premier.\
+\ls2\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Le prompt syst\'e8me est l'outil de conformit\'e9 : exiger la citation des sources et le refus explicite en cas d'absence d'information \'e9limine l'essentiel des hallucinations sur ce cas d'usage.\
+\ls2\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Bonnes pratiques appliqu\'e9es : cl\'e9 API en variable d'environnement, environnement virtuel isol\'e9, un seul appel d'embeddings pour tout le corpus, gestion des erreurs d'API (429 : limite de d\'e9bit, r\'e9essayer apr\'e8s pause).\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 Pistes d'am\'e9lioration\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls3\ilvl0
+\f1\b0\fs24 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Ajouter un reranker pour fiabiliser le classement des passages sur un corpus plus grand.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 D\'e9coupage par sections titr\'e9es plut\'f4t que par paragraphes.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 R\'e9essai automatique avec temporisation sur les erreurs 429.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Interface web minimaliste (streamlit) pour une d\'e9monstration client.\
+}

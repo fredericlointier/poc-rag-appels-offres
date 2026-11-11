@@ -1,0 +1,5 @@
+Notre organisme dispose d'un système d'information certifié SecNumCloud. 
+
+Les données sont hébergées en France. 
+
+Le taux de disponibilité garanti est de 99,75 %.
