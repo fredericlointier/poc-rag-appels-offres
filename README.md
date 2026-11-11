@@ -24,6 +24,10 @@ Réponse de manuel, hors sujet. Après RAG, avec les mêmes documents :
 ## C. Installation
 
 ```bash
+# 0. Récupérer le projet
+git clone https://github.com/fredericlointier/poc-rag-appels-offres.git
+cd poc-rag-appels-offres
+
 # 1. Créer un environnement virtuel
 python3 -m venv venv
 source venv/bin/activate
@@ -35,7 +39,7 @@ pip install mistralai
 export MISTRAL_API_KEY="votre_cle"
 
 # 4. Lancer
-python assistant_ao.py
+python3 assistant_ao.py
 ```
 
 Compatible Python 3.10+. Testé avec le package `mistralai` 3.7 (la classe `Mistral` y est importée depuis `mistralai.client` ; avec les versions 1.x, l'import se fait directement depuis `mistralai`).
